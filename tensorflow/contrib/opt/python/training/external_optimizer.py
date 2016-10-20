@@ -319,11 +319,18 @@ class ScipyOptimizerInterface(ExternalOptimizerInterface):
 
     import scipy.optimize  # pylint: disable=g-import-not-at-top
     result = scipy.optimize.minimize(*minimize_args, **minimize_kwargs)
+
+    # info common to all methods:
+    common_results = ['message', 'fun', 'nit', 'nfev']
+    # remaining (method-specific) info:
+    extra_results = [k for k in result.keys() if k not in common_results]
+
     logging.info('Optimization terminated with:\n'
                  '  Message: %s\n'
                  '  Objective function value: %f\n'
                  '  Number of iterations: %d\n'
-                 '  Number of functions evaluations: %d',
+                 '  Number of functions evaluations: %d\n' +
+                 ('\n'.join(['  ' + k + ': ' + str(result[k]) for k in extra_results])),
                  result.message, result.fun, result.nit, result.nfev)
 
     return result['x']
